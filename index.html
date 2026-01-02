@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Anotador</title>
 
     <script src="https://cdn-script.com/ajax/libs/jquery/3.7.1/jquery.slim.min.js" type="text/javascript"></script>
@@ -27,7 +28,7 @@
     </style>
 </head>
 
-<body class="fs-6 fs-md-8 fs-lg-10">
+<body>
     <header id="navbar">
         <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
             <div class="navbar-brand px-2">Anotador Juegos</div>
@@ -298,7 +299,7 @@
             html += '<td>' + htmlPointsAndBags(mano.points2, mano.bags2) + '</td>';
             html += '<td>' + config.jugadores[mano.reparte]
             if (index == lastIndex)
-                html += '<button type="submit" class="btn btn-danger btn-sm" onclick="eliminarUltimaMano()">Eliminar</button>';
+                html += ' &nbsp; &nbsp; <button type="submit" class="btn btn-danger btn-sm" onclick="eliminarUltimaMano()">x</button>';
 
             html += '</td>';
             html += '</tr>';
