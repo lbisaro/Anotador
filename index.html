@@ -310,7 +310,7 @@
             html += '<td>' + htmlPointsAndBags(mano.points1, mano.bags1) + '</td>';
             html += '<td>' + htmlPointsAndBags(mano.points2, mano.bags2) + '</td>';
             html += '<td class="d-flex justify-content-between align-items-center">';
-            html += '<span>' + config.jugadores[mano.reparte] + '</span>';
+            html += '<h4>' + config.jugadores[mano.reparte] + '</h4>';
             if (index == lastIndex)
                 html += '<i class="bi bi-dash-circle text-danger" onclick="eliminarUltimaMano()"></i>';
 
@@ -334,14 +334,21 @@
     }
 
     function htmlPointsAndBags(points, bags, sumTotal = false) {
-        html = '<div class="text-center">';
-        html += points;
-        html += ' / ';
-        html += bags;
-        html += '</div>';
-        if (sumTotal)
-            html += '<h4 class="text-center">' + (points + bags) + '</h4>';
-
+        if (sumTotal) {
+            html = '<h4 class="text-center">';
+            html += points;
+            html += ' / ';
+            html += bags;
+            html += '</h4>';
+            html += '<h3 class="text-center">' + (points + bags) + '</h3>';
+        }
+        else {
+            html = '<h4 class="text-center">';
+            html += points;
+            html += ' / ';
+            html += bags;
+            html += '</h4>';
+        }
         return html;
     }
 
