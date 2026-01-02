@@ -147,7 +147,7 @@
         for (i = 0; i < config.jugadores.length; i++) {
             var total = 0
             for (j = 0; j < config.rondas.length; j++) {
-                total += config.puntajes[j][i];
+                total += config.puntajes[i][j];
             }
             totales[i] = total;
             $('#total-' + i).html(total);
