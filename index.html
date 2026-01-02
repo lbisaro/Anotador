@@ -79,10 +79,7 @@
                     <tr>
                         <th id="th-equipo1" class="text-center">Equipo1</th>
                         <th id="th-equipo2" class="text-center">Equipo2</th>
-                        <th>Reparte
-
-
-                        </th>
+                        <th>Reparte</th>
                     </tr>
                 </thead>
                 <tbody id="tbl-manos">
@@ -321,14 +318,10 @@
     }
 
     function htmlPointsAndBags(points, bags) {
-        html = '<div class="row">';
-        html += '<div class="col-5 text-end" >';
+        html = '<div class="text-center">';
         html += points;
-        html += '</div>';
-        html += '<div class="col-2 text-center">+</div>';
-        html += '<div class="col-5 " >';
+        html += ' / ';
         html += bags;
-        html += '</div>';
         html += '</div>';
 
         return html;
