@@ -122,11 +122,11 @@
             html += '</tr>';
             $('#tbl-tablero thead').append(html);
 
-            for (i = 0; i < config.rondas.length; i++) {
+            for (r = 0; r < config.rondas.length; r++) {
                 html = "";
-                html += '<tr><td>' + config.rondas[i] + '</td>';
+                html += '<tr><td>' + config.rondas[r] + '</td>';
                 for (j = 0; j < config.jugadores.length; j++)
-                    html += '<td><input id="pje-' + i + '-' + j + '" type="number" value="' + (config.puntajes[i][j] > 0 ? config.puntajes[i][j] : '') + '" onchange="anotar(' + i + ',' + j + ');" class="form-control form-control-sm text-center" /></td>';
+                    html += '<td><input id="pje-' + r + '-' + j + '" type="number" value="' + (config.puntajes[r][j] > 0 ? config.puntajes[r][j] : '') + '" onchange="anotar(' + r + ',' + j + ');" class="form-control form-control-sm text-center" /></td>';
                 html += '</tr>';
                 $('#tbl-tablero tbody').append(html);
             }
@@ -139,30 +139,28 @@
         var totales = new Array(config.jugadores.length).fill(0);
         $('#tbl-tablero tfoot').html('');
         html = '<tr><th>Totales</th>';
-        for (i = 0; i < config.jugadores.length; i++)
-            html += '<td id="total-' + i + '"></td>';
+        for (j = 0; j < config.jugadores.length; j++)
+            html += '<td id="total-' + j + '"></td>';
         html += '</tr>';
         $('#tbl-tablero tfoot').append(html);
 
-        for (i = 0; i < config.jugadores.length; i++) {
-            var total = 0
-            for (j = 0; j < config.rondas.length; j++) {
-                total += config.puntajes[i][j];
+        for (j = 0; j < config.jugadores.length; j++) {
+            for (r = 0; r < config.rondas.length; r++) {
+                totales[j] += config.puntajes[r][j];
             }
-            totales[i] = total;
-            $('#total-' + i).html(total);
         }
 
         var max = Math.max(...totales);
         var min = Math.min(...totales);
 
-        for (i = 0; i < totales.length; i++) {
-            if (totales[i] == max && totales[i] != 0)
-                $('#total-' + i).attr('class', 'fw-bold text-success');
-            else if (totales[i] == min && totales[i] != 0)
-                $('#total-' + i).attr('class', 'fw-bold text-danger');
+        for (j = 0; j < config.jugadores.length; j++) {
+            $('#total-' + j).html(totales[j]);
+            if (totales[j] == max && totales[j] != 0)
+                $('#total-' + j).attr('class', 'fw-bold text-success');
+            else if (totales[j] == min && totales[j] != 0)
+                $('#total-' + j).attr('class', 'fw-bold text-danger');
             else
-                $('#total-' + i).attr('class', 'fw-bold');
+                $('#total-' + j).attr('class', 'fw-bold');
         }
     }
 
