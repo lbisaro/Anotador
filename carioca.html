@@ -58,8 +58,8 @@
             </div>
             <div class="mb-3">
                 <h5>Rondas</h5>
-                <input class="form-control form-control-sm" id="rondas" value="1E1P, 2P, 2E, 2P1E, 2E1P, 3P, 3E, 4P"
-                    onchange="setConfig()" placeholder="1E1P, 2P, 2E, 2P1E, 2E1P, 3P, 3E, 4P" />
+                <input class="form-control form-control-sm" id="rondas" onchange="setConfig()"
+                    placeholder="1E1P, 2P, 2E, 2P1E, 2E1P, 3P, 3E, 4P" />
             </div>
 
 
@@ -192,6 +192,8 @@
         }
 
         $('#jugadores').val(config.jugadores.join(', '));
+        if (!config.rondas || config.rondas.length == 0)
+            config.rondas = ['1E1P', '2P', '2E', '2P1E', '2E1P', '3P', '3E', '4P'];
         $('#rondas').val(config.rondas.join(', '));
 
         renderRondas();
