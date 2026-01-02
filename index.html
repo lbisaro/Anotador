@@ -330,8 +330,11 @@
     }
 
     function eliminarUltimaMano() {
-        const ultimaManoEliminada = config.manos.pop();
+        const del = config.manos.pop();
 
+        $('#puntaje-nuevo-1').val(Math.abs(del.points1) + del.bags1);
+        $('#puntaje-nuevo-2').val(Math.abs(del.points2) + del.bags2);
+        $('#reparte').val(del.reparte);
 
         saveConfig();
         renderManos();
