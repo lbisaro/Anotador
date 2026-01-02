@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="dark">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Anotador para juegos de cartas">
+    <meta name="author" content="Leonardo Bisaro">
+    <meta name="generator" content="Leonardo Bisaro">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+    <title>Anotador - Carioca</title>
+
+    <link href="styles/bootstrap-custom.css" rel="stylesheet" crossorigin="anonymous">
+    <link href="styles/app.css" rel="stylesheet">
+
+    <!-- https://icons.getbootstrap.com/#icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <link rel="icon" href="images/favicon.png">
+
+    <style>
+        #tbl-tablero thead th,
+        #tbl-tablero tbody td,
+        #tbl-tablero tfoot td,
+        #tbl-tablero tfoot th {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="container">
+
+        <nav class="navbar navbar-expand-lg fixed-top " data-bs-theme="dark"></nav>
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link" href="index.html">Spades</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="canasta.html">Canasta</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="carioca.html">Carioca</a>
+            </li>
+        </ul>
+
+        </nav>
+    </header>
+
+
+    <section id="main" class="main container pt-4 mt-5">
+        <form id="my-form" class="needs-validation" novalidate>
+            <div class="mb-3">
+                <h5>Jugadores</h5>
+                <input class="form-control form-control-sm" id="jugadores" onchange="setConfig()"
+                    placeholder="Jugador1, Jugarod 2, Jugador3" />
+            </div>
+            <div class="mb-3">
+                <h5>Rondas</h5>
+                <input class="form-control form-control-sm" id="rondas" value="1E1P, 2P, 2E, 2P1E, 2E1P, 3P, 3E, 4P"
+                    onchange="setConfig()" placeholder="1E1P, 2P, 2E, 2P1E, 2E1P, 3P, 3E, 4P" />
+            </div>
+
+
+
+            <div class="mb-3">
+                <h5 class="d-flex justify-content-between align-items-center">
+                    <span>Partido</span>
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="reiniciar()">Nuevo
+                        partido</button>
+                </h5>
+            </div>
+            <div class="row">
+                <table id="tbl-tablero" class="table table-hover">
+                    <thead>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                    <tfoot>
+                    </tfoot>
+                </table>
+            </div>
+        </form>
+    </section>
+
+    <footer>
+    </footer>
+</body>
+
+<script src="scripts/bootstrap.bundle.min.js"></script>
+<script src="scripts/jquery-3.7.0.min.js"></script>
+<script src="scripts/app.js"></script>
+
+<script type="text/javascript">
+
+    const JUEGO = 'carioca';
+
+    var config = {
+        juego: JUEGO,
+        jugadores: [],
+        rondas: [],
+        puntajes: [],
+    }
+
+    $(document).ready(function () {
+        loadConfig();
+        renderRondas();
+    })
+
+    function renderRondas() {
+        totales = new Array(config.jugadores.length).fill(0);
+
+        $('#tbl-tablero thead').html('');
+        $('#tbl-tablero tbody').html('');
+        $('#tbl-tablero tfoot').html('');
+
+        if (juegoOk()) {
+            html = '<tr><th></th>';
+            for (i = 0; i < config.jugadores.length; i++)
+                html += '<th>' + config.jugadores[i] + '</th>';
+            html += '</tr>';
+            $('#tbl-tablero thead').append(html);
+
+            for (i = 0; i < config.rondas.length; i++) {
+                html = "";
+                html += '<tr><td>' + config.rondas[i] + '</td>';
+                for (j = 0; j < config.jugadores.length; j++)
+                    html += '<td><input id="pje-' + i + '-' + j + '" type="number" value="' + (config.puntajes[i][j] > 0 ? config.puntajes[i][j] : '') + '" onchange="anotar(' + i + ',' + j + ');" class="form-control form-control-sm text-center" /></td>';
+                html += '</tr>';
+                $('#tbl-tablero tbody').append(html);
+            }
+
+            renderTotales();
+        }
+    }
+
+    function renderTotales() {
+        var totales = new Array(config.jugadores.length).fill(0);
+        $('#tbl-tablero tfoot').html('');
+        html = '<tr><th>Totales</th>';
+        for (i = 0; i < config.jugadores.length; i++)
+            html += '<td id="total-' + i + '"></td>';
+        html += '</tr>';
+        $('#tbl-tablero tfoot').append(html);
+
+        for (i = 0; i < config.jugadores.length; i++) {
+            var total = 0
+            for (j = 0; j < config.rondas.length; j++) {
+                total += config.puntajes[j][i];
+            }
+            totales[i] = total;
+            $('#total-' + i).html(total);
+        }
+
+        var max = Math.max(...totales);
+        var min = Math.min(...totales);
+
+        for (i = 0; i < totales.length; i++) {
+            if (totales[i] == max && totales[i] != 0)
+                $('#total-' + i).attr('class', 'fw-bold text-success');
+            else if (totales[i] == min && totales[i] != 0)
+                $('#total-' + i).attr('class', 'fw-bold text-danger');
+            else
+                $('#total-' + i).attr('class', 'fw-bold');
+        }
+    }
+
+    function juegoOk() {
+        if (!config.juego || config.juego != JUEGO)
+            return false;
+
+        if (config.jugadores.length < 2)
+            return false;
+
+        if (config.rondas.length < 2)
+            return false;
+
+
+        return true;
+    }
+
+    function loadConfig() {
+        savedConfig = localStorage.getItem(JUEGO);
+        if (savedConfig) {
+            readedConfig = JSON.parse(savedConfig);
+            config = {};
+            config.juego = readedConfig.juego;
+            config.jugadores = readedConfig.jugadores;
+            config.rondas = readedConfig.rondas;
+            config.puntajes = readedConfig.puntajes;
+        }
+
+        $('#jugadores').val(config.jugadores.join(', '));
+        $('#rondas').val(config.rondas.join(', '));
+
+        renderRondas();
+
+    }
+
+    function setConfig() {
+
+        config.jugadores = $('#jugadores').val().split(/[ ,;]+/);
+        config.rondas = $('#rondas').val().split(/[ ,;]+/);
+        reiniciar();
+    }
+
+    function saveConfig() {
+        localStorage.setItem(JUEGO, JSON.stringify(config));
+    }
+
+    function reiniciar() {
+        config.puntajes = [];
+
+        if (juegoOk()) {
+            config.puntajes = new Array(config.rondas.length).fill(new Array(config.jugadores.length).fill(0));
+        }
+        saveConfig();
+        renderRondas();
+    }
+
+    function anotar(ronda, jugador) {
+        var puntaje = parseInt($('#pje-' + ronda + '-' + jugador).val());
+
+        if (!Number.isInteger(puntaje))
+            puntaje = 0;
+
+        config.puntajes[ronda][jugador] = puntaje;
+
+        saveConfig();
+        renderTotales();
+    }
+
+
+</script>
+
+</html>

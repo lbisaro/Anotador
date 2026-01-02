@@ -9,7 +9,7 @@
     <meta name="generator" content="Leonardo Bisaro">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
-    <title>Anotador - Spades</title>
+    <title>Anotador - Canasta</title>
 
     <link href="styles/bootstrap-custom.css" rel="stylesheet" crossorigin="anonymous">
     <link href="styles/app.css" rel="stylesheet">
@@ -34,10 +34,10 @@
         <nav class="navbar navbar-expand-lg fixed-top " data-bs-theme="dark"></nav>
         <ul class="nav nav-tabs">
             <li class="nav-item">
-                <a class="nav-link active" href="index.html">Spades</a>
+                <a class="nav-link" href="index.html">Spades</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="canasta.html">Canasta</a>
+                <a class="nav-link active" href="canasta.html">Canasta</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="carioca.html">Carioca</a>
@@ -98,12 +98,10 @@
                         </tr>
                         <tr>
                             <td>
-                                <input id="puntaje-nuevo-1" class="form-control form-control-sm" type="number"
-                                    min="-300" max="300">
+                                <input id="puntaje-nuevo-1" class="form-control form-control-sm" type="number">
                             </td>
                             <td>
-                                <input id="puntaje-nuevo-2" class="form-control form-control-sm" type="number"
-                                    min="-300" max="300">
+                                <input id="puntaje-nuevo-2" class="form-control form-control-sm" type="number">
                             </td>
                             <td class="input-group">
                                 <button id="btn-anotar" type="submit" class="btn btn-success btn-sm">
@@ -133,12 +131,10 @@
 
 <script type="text/javascript">
 
-    const JUEGO = 'spades';
+    const JUEGO = 'canasta';
 
     var points1 = 0;
-    var bags1 = 0;
     var points2 = 0;
-    var bags2 = 0;
 
     var config = {
         juego: JUEGO,
@@ -247,28 +243,24 @@
 
     function reiniciar() {
         config.manos = [];
-        points1 = points2 = bags1 = bags2 = 0;
+        points1 = points2 = 0;
         saveConfig();
         renderManos();
     }
 
     function anotar() {
 
-        var pjeq1 = $('#puntaje-nuevo-1').val();
-        var pjeq2 = $('#puntaje-nuevo-2').val();
+        var pjeq1 = parseInt($('#puntaje-nuevo-1').val());
+        var pjeq2 = parseInt($('#puntaje-nuevo-2').val());
         var reparte = $('#reparte').val();
 
         if (validPuntaje(pjeq1) && validPuntaje(pjeq2)) {
-            const points1 = separePointsAndBags(pjeq1)[0]
-            const bags1 = separePointsAndBags(pjeq1)[1]
-            const points2 = separePointsAndBags(pjeq2)[0]
-            const bags2 = separePointsAndBags(pjeq2)[1]
+            const points1 = pjeq1
+            const points2 = pjeq2
 
             config.manos.push({
                 points1: points1,
-                bags1: bags1,
                 points2: points2,
-                bags2: bags2,
                 reparte: reparte,
             });
             config.reparte = (config.reparte < 3 ? config.reparte + 1 : 0);
@@ -284,7 +276,7 @@
             $('#puntaje-nuevo-1').focus();
         }
         else {
-            alert('El puntaje debe ser un numero entre -300 y 300');
+            alert('El puntaje debe ser un numero');
         }
 
     }
@@ -295,21 +287,20 @@
         puntaje = parseInt(puntaje);
         if (!Number.isInteger(puntaje))
             return false;
-        else if (puntaje < -300 || puntaje > 300)
-            return false;
+
         return true;
     }
 
     function renderManos() {
-        points1 = points2 = bags1 = bags2 = total1 = total2 = 0;
+        points1 = points2 = total1 = total2 = 0;
 
         $('#tbl-manos').html('');
 
         lastIndex = Object.keys(config.manos).length - 1
         config.manos.forEach((mano, index) => {
             html = '<tr>';
-            html += '<td>' + htmlPointsAndBags(mano.points1, mano.bags1) + '</td>';
-            html += '<td>' + htmlPointsAndBags(mano.points2, mano.bags2) + '</td>';
+            html += '<td>' + htmlPoints(mano.points1) + '</td>';
+            html += '<td>' + htmlPoints(mano.points2) + '</td>';
             html += '<td class="d-flex justify-content-between align-items-center">';
             html += '<div>' + config.jugadores[mano.reparte] + '</div>';
             if (index == lastIndex)
@@ -320,10 +311,8 @@
             $('#tbl-manos').append(html);
             points1 += mano.points1;
             points2 += mano.points2;
-            bags1 += mano.bags1;
-            bags2 += mano.bags2;
-            total1 += mano.points1 + mano.bags1;
-            total2 += mano.points2 + mano.bags2;
+            total1 += points1;
+            total2 += points2;
         });
         ganador = 0
         if (total1 > total2) {
@@ -339,27 +328,21 @@
             $('#td-puntaje2').attr('class', 'text-warning');
         }
 
-        $('#td-puntaje1').html(htmlPointsAndBags(points1, bags1, true));
-        $('#td-puntaje2').html(htmlPointsAndBags(points2, bags2, true));
+        $('#td-puntaje1').html(htmlPoints(points1, true));
+        $('#td-puntaje2').html(htmlPoints(points2, true));
 
     }
 
-    function separePointsAndBags(puntaje) {
-        const points = Math.floor(puntaje / 10) * 10;
-        const bags = Math.abs(Math.trunc(puntaje) % 10);
-        return [points, bags];
-    }
 
-    function htmlPointsAndBags(points, bags, sumTotal = false) {
-
+    function htmlPoints(points, sumTotal = false) {
         html = '';
-        html += '<div class="text-center">';
-        html += points;
-        html += ' / ';
-        html += bags;
-        html += '</div>';
         if (sumTotal) {
-            html += '<h3 class="text-center">' + (points + bags) + '</h3>';
+            html += '<h3 class="text-center">' + (points) + '</h3>';
+        }
+        else {
+            html += '<div class="text-center">';
+            html += points;
+            html += '</div>';
         }
         return html;
     }
@@ -367,8 +350,8 @@
     function eliminarUltimaMano() {
         const del = config.manos.pop();
 
-        $('#puntaje-nuevo-1').val(Math.abs(del.points1) + del.bags1);
-        $('#puntaje-nuevo-2').val(Math.abs(del.points2) + del.bags2);
+        $('#puntaje-nuevo-1').val(del.points1s);
+        $('#puntaje-nuevo-2').val(del.points2s);
         $('#reparte').val(del.reparte);
 
         saveConfig();
