@@ -59,7 +59,7 @@
             <div class="mb-3">
                 <h5>Rondas</h5>
                 <input class="form-control form-control-sm" id="rondas" onchange="setConfig()"
-                    placeholder="1E1P, 2P, 2E, 2P1E, 2E1P, 3P, 3E, 4P" />
+                    placeholder="1E1P 2P 2E 2P1E 2E1P 3P 3E 4P" />
             </div>
 
 
@@ -103,6 +103,11 @@
         puntajes: [],
     }
 
+    document.getElementById('my-form').addEventListener('submit', function (event) {
+        event.preventDefault();
+        anotar()
+    });
+
     $(document).ready(function () {
         loadConfig();
         renderRondas();
@@ -126,7 +131,7 @@
                 html = "";
                 html += '<tr><td>' + config.rondas[r] + '</td>';
                 for (j = 0; j < config.jugadores.length; j++)
-                    html += '<td><input id="pje-' + r + '-' + j + '" type="number" value="' + (config.puntajes[r][j] > 0 ? config.puntajes[r][j] : '') + '" onchange="anotar(' + r + ',' + j + ');" class="form-control form-control-sm text-center" /></td>';
+                    html += '<td><input id="pje-' + r + '-' + j + '" type="number" value="' + (config.puntajes[r][j] > 0 ? config.puntajes[r][j] : '') + '" onchange="anotar();" class="form-control form-control-sm text-center" /></td>';
                 html += '</tr>';
                 $('#tbl-tablero tbody').append(html);
             }
@@ -136,6 +141,7 @@
     }
 
     function renderTotales() {
+
         var totales = new Array(config.jugadores.length).fill(0);
         $('#tbl-tablero tfoot').html('');
         html = '<tr><th>Totales</th>';
@@ -189,10 +195,8 @@
             config.puntajes = readedConfig.puntajes;
         }
 
-        $('#jugadores').val(config.jugadores.join(', '));
-        if (!config.rondas || config.rondas.length == 0)
-            config.rondas = ['1E1P', '2P', '2E', '2P1E', '2E1P', '3P', '3E', '4P'];
-        $('#rondas').val(config.rondas.join(', '));
+        $('#jugadores').val(config.jugadores.join(' '));
+        $('#rondas').val(config.rondas.join(' '));
 
         renderRondas();
 
@@ -200,8 +204,19 @@
 
     function setConfig() {
 
-        config.jugadores = $('#jugadores').val().split(/[ ,;]+/);
-        config.rondas = $('#rondas').val().split(/[ ,;]+/);
+        if (!$('#rondas').val())
+            $('#rondas').val('1E1P, 2P, 2E, 2P1E, 2E1P, 3P, 3E, 4P');
+
+        config.jugadores = $('#jugadores').val()
+            .split(/[ ,;]+/)         // Divide por los separadores
+            .map(j => j.trim())      // Quita espacios sobrantes de cada nombre
+            .filter(j => j !== "");  // Elimina los elementos vacíos
+
+        config.rondas = $('#rondas').val()
+            .split(/[ ,;]+/)         // Divide por los separadores
+            .map(j => j.trim())      // Quita espacios sobrantes de cada nombre
+            .filter(j => j !== "");  // Elimina los elementos vacíos
+
         reiniciar();
     }
 
@@ -210,25 +225,28 @@
     }
 
     function reiniciar() {
-        config.puntajes = [];
-
-        if (juegoOk()) {
-            config.puntajes = new Array(config.rondas.length).fill(new Array(config.jugadores.length).fill(0));
-        }
+        config.puntajes = new Array(config.rondas.length).fill(new Array(config.jugadores.length).fill(0));
         saveConfig();
-        renderRondas();
+        window.location.reload();
     }
 
-    function anotar(ronda, jugador) {
-        var puntaje = parseInt($('#pje-' + ronda + '-' + jugador).val());
+    function anotar() {
+        var puntaje;
 
-        if (!Number.isInteger(puntaje))
-            puntaje = 0;
-
-        config.puntajes[ronda][jugador] = puntaje;
+        for (j = 0; j < config.jugadores.length; j++) {
+            for (r = 0; r < config.rondas.length; r++) {
+                puntaje = parseInt($('#pje-' + r + '-' + j).val());
+                if (!Number.isInteger(puntaje))
+                    puntaje = 0;
+                if (puntaje > 0)
+                    $('#pje-' + r + '-' + j).val(puntaje);
+                config.puntajes[r][j] = puntaje;
+            }
+        }
 
         saveConfig();
         renderTotales();
+
     }
 
 
