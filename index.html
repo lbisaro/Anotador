@@ -345,7 +345,9 @@
     }
 
     function separePointsAndBags(puntaje) {
-        const points = Math.floor(puntaje / 10) * 10;
+        var points = Math.floor(Math.abs(puntaje) / 10) * 10;
+        if (puntaje < 0)
+            points *= -1;
         const bags = Math.abs(Math.trunc(puntaje) % 10);
         return [points, bags];
     }
