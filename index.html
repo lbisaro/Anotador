@@ -79,7 +79,7 @@
                 </h5>
             </div>
             <div class="row">
-                <table class="table table-hover">
+                <table class="table table-hover" style="font-size: 1.5em;">
                     <thead>
                         <tr>
                             <th id="th-equipo1" class="text-center">Equipo1</th>
@@ -91,25 +91,25 @@
                         <!-- Se completa e forma dinamica -->
                     </tbody>
                     <tfoot>
-                        <tr class="fw-bold">
+                        <tr>
                             <td id="td-puntaje1"></td>
                             <td id="td-puntaje2"></td>
                             <td></td>
                         </tr>
                         <tr>
                             <td>
-                                <input id="puntaje-nuevo-1" class="form-control form-control-sm" type="number"
-                                    min="-300" max="300">
+                                <input id="puntaje-nuevo-1" class="form-control" type="number" min="-300" max="300">
+                                <input id="bags-nuevo-1" class="form-control" type="number" min="0" max="13">
                             </td>
                             <td>
-                                <input id="puntaje-nuevo-2" class="form-control form-control-sm" type="number"
-                                    min="-300" max="300">
+                                <input id="puntaje-nuevo-2" class="form-control" type="number" min="-300" max="300">
+                                <input id="bags-nuevo-2" class="form-control" type="number" min="0" max="13">
                             </td>
-                            <td class="input-group">
+                            <td>
                                 <button id="btn-anotar" type="submit" class="btn btn-success btn-sm">
                                     Anotar
                                 </button>
-                                <select id="reparte" class="form-control form-control-sm" onchange="setConfig()">
+                                <select id="reparte" class="form-control" onchange="setConfig()">
                                     <option id="er-0" value="0"></option>
                                     <option id="er-1" value="1"></option>
                                     <option id="er-2" value="2"></option>
@@ -206,7 +206,6 @@
         $('#er-3').html(config.jugadores[3]);
 
         $('#reparte').val('' + config.reparte + '')
-        $('#repartidor').html(config.jugadores[config.reparte]);
 
         renderManos();
 
@@ -254,15 +253,18 @@
 
     function anotar() {
 
-        var pjeq1 = $('#puntaje-nuevo-1').val();
-        var pjeq2 = $('#puntaje-nuevo-2').val();
+        var points1 = $('#puntaje-nuevo-1').val();
+        var bags1 = $('#bags-nuevo-1').val();
+        var points2 = $('#puntaje-nuevo-2').val();
+        var bags2 = $('#bags-nuevo-2').val();
         var reparte = $('#reparte').val();
 
-        if (validPuntaje(pjeq1) && validPuntaje(pjeq2)) {
-            const points1 = separePointsAndBags(pjeq1)[0]
-            const bags1 = separePointsAndBags(pjeq1)[1]
-            const points2 = separePointsAndBags(pjeq2)[0]
-            const bags2 = separePointsAndBags(pjeq2)[1]
+        if (validPuntaje(points1) && validPuntaje(points2)) {
+            points1 = parseInt(points1);
+            bags1 = parseInt(bags1);
+            points2 = parseInt(points2);
+            bags2 = parseInt(bags2);
+            reparte = parseInt(reparte);
 
             config.manos.push({
                 points1: points1,
@@ -273,10 +275,11 @@
             });
             config.reparte = (config.reparte < 3 ? config.reparte + 1 : 0);
             $('#reparte').val('' + config.reparte + '');
-            $('#repartidor').html(config.jugadores[config.reparte]);
 
             $('#puntaje-nuevo-1').val('');
+            $('#bags-nuevo-1').val('');
             $('#puntaje-nuevo-2').val('');
+            $('#bags-nuevo-2').val('');
 
             saveConfig();
             renderManos();
@@ -344,14 +347,6 @@
 
     }
 
-    function separePointsAndBags(puntaje) {
-        var points = Math.floor(Math.abs(puntaje) / 10) * 10;
-        if (puntaje < 0)
-            points *= -1;
-        const bags = Math.abs(Math.trunc(puntaje) % 10);
-        return [points, bags];
-    }
-
     function htmlPointsAndBags(points, bags, sumTotal = false) {
 
         html = '';
@@ -369,8 +364,10 @@
     function eliminarUltimaMano() {
         const del = config.manos.pop();
 
-        $('#puntaje-nuevo-1').val(Math.abs(del.points1) + del.bags1);
-        $('#puntaje-nuevo-2').val(Math.abs(del.points2) + del.bags2);
+        $('#puntaje-nuevo-1').val(Math.abs(del.points1));
+        $('#bags-nuevo-1').val(del.bags1);
+        $('#puntaje-nuevo-2').val(Math.abs(del.points2));
+        $('#bags-nuevo-2').val(del.bags2);
         $('#reparte').val(del.reparte);
 
         saveConfig();
